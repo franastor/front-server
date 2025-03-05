@@ -1,28 +1,80 @@
 import React, { useState, useEffect } from 'react'
 import './App.css'
-import SystemInfo from './components/SystemInfo'
-import './components/SystemInfo.css'
 
 function App() {
   const [currentLine, setCurrentLine] = useState('')
   const [currentIndex, setCurrentIndex] = useState(0)
   const [loading, setLoading] = useState(0)
+  const [systemInfo, setSystemInfo] = useState({
+    os: 'Detectando...',
+    ip: 'Detectando...',
+    browser: 'Detectando...'
+  })
   
   const commands = [
     { text: 'Bienvenido al mundo franastor', delay: 100 },
     { text: 'Iniciando secuencia de acceso...', delay: 2000 },
     { text: 'Detectando sistema operativo...', delay: 2000 },
-    { text: 'Sistema: macOS 24.3.0', delay: 2000 },
+    { text: `Sistema: ${systemInfo.os}`, delay: 2000 },
+    { text: 'Detectando navegador...', delay: 2000 },
+    { text: `Navegador: ${systemInfo.browser}`, delay: 2000 },
     { text: 'Obteniendo dirección IP...', delay: 2000 },
-    { text: 'IP: 192.168.1.100', delay: 2000 },
+    { text: `IP: ${systemInfo.ip}`, delay: 2000 },
     { text: 'Escaneando puertos...', delay: 2000 },
     { text: 'Puerto 22 (SSH) - Abierto', delay: 2000 },
     { text: 'Intentando conexión SSH...', delay: 2000 },
     { text: 'Acceso SSH concedido', delay: 2000 },
-    { text: 'Conectado como: franastor@192.168.1.100', delay: 2000 },
+    { text: `Conectado como: franastor@${systemInfo.ip}`, delay: 2000 },
     { text: 'Acceso al sistema completado', delay: 2000 },
     { text: 'Sistema comprometido exitosamente', delay: 2000 }
   ]
+
+  useEffect(() => {
+    // Detectar sistema operativo y navegador
+    const userAgent = navigator.userAgent;
+    let os = 'Desconocido';
+    let browser = 'Desconocido';
+
+    // Detectar navegador
+    if (userAgent.includes('Firefox')) browser = 'Firefox';
+    else if (userAgent.includes('Chrome')) browser = 'Chrome';
+    else if (userAgent.includes('Safari')) browser = 'Safari';
+    else if (userAgent.includes('Edge')) browser = 'Edge';
+    else if (userAgent.includes('Opera')) browser = 'Opera';
+    else if (userAgent.includes('MSIE') || userAgent.includes('Trident/')) browser = 'Internet Explorer';
+
+    // Detectar sistema operativo
+    if (userAgent.includes('Windows')) os = 'Windows';
+    else if (userAgent.includes('Mac')) os = 'macOS';
+    else if (userAgent.includes('Linux')) os = 'Linux';
+    else if (userAgent.includes('Android')) os = 'Android';
+    else if (userAgent.includes('iOS')) os = 'iOS';
+
+    // Obtener IP
+    fetch('https://api.ipify.org?format=json')
+      .then(response => response.json())
+      .then(data => {
+        setSystemInfo({
+          os: os,
+          ip: data.ip,
+          browser: browser
+        });
+      })
+      .catch(error => {
+        console.error('Error al obtener la IP:', error);
+        setSystemInfo(prev => ({
+          ...prev,
+          ip: 'No disponible'
+        }));
+      });
+
+    // Actualizar info del sistema
+    setSystemInfo(prev => ({
+      ...prev,
+      os: os,
+      browser: browser
+    }));
+  }, []);
 
   useEffect(() => {
     if (currentIndex < commands.length) {
@@ -34,7 +86,7 @@ function App() {
 
       return () => clearTimeout(timer)
     }
-  }, [currentIndex])
+  }, [currentIndex, systemInfo])
 
   useEffect(() => {
     if (currentIndex < commands.length && currentIndex > 0) {
@@ -53,7 +105,6 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>Ejecutando Terminal Remoto</h1>
-        <SystemInfo />
       </header>
       <div className="terminal-container">
         <div className="terminal">
