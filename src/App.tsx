@@ -12,6 +12,8 @@ function App() {
   const [combo, setCombo] = useState(0)
   const [comboText, setComboText] = useState<Array<{ id: number, text: string }>>([])
   const [skullSpeed, setSkullSpeed] = useState(8)
+  const [maxSkulls, setMaxSkulls] = useState(3)
+  const [skullSpawnInterval, setSkullSpawnInterval] = useState(1000)
   const [systemInfo, setSystemInfo] = useState({
     os: 'Detectando...',
     ip: 'Detectando...',
@@ -179,6 +181,13 @@ function App() {
         const comboText = `${newCombo}x COMBO!`
         setComboText(prev => [...prev, { id: Date.now(), text: comboText }])
         
+        // Aumentar dificultad basada en el combo
+        if (newCombo >= 5) {
+          setSkullSpeed(prev => Math.max(prev - 0.5, 3))
+          setMaxSkulls(prev => Math.min(prev + 1, 8))
+          setSkullSpawnInterval(prev => Math.max(prev - 100, 300))
+        }
+        
         // Eliminar el texto después de la animación
         setTimeout(() => {
           setComboText(prev => prev.filter(text => text.id !== Date.now()))
@@ -193,9 +202,11 @@ function App() {
       return newCombo
     })
 
-    // Aumentar velocidad cada 5 calaveras
-    if ((explodedSkulls + 1) % 5 === 0) {
-      setSkullSpeed(prev => Math.max(prev - 1, 3))
+    // Aumentar dificultad base cada 10 calaveras
+    if ((explodedSkulls + 1) % 10 === 0) {
+      setSkullSpeed(prev => Math.max(prev - 0.5, 3))
+      setMaxSkulls(prev => Math.min(prev + 1, 8))
+      setSkullSpawnInterval(prev => Math.max(prev - 100, 300))
     }
 
     // Eliminar la calavera y las partículas después de la animación
@@ -218,10 +229,13 @@ function App() {
   useEffect(() => {
     if (currentIndex >= 17) {
       let lastSkullTime = Date.now()
-      const skullInterval = setInterval(() => {
+      const interval = setInterval(() => {
         const currentTime = Date.now()
-        // Evitar crear calaveras si la última fue hace menos de 500ms
-        if (currentTime - lastSkullTime < 500) return
+        // Evitar crear calaveras si la última fue hace menos del intervalo mínimo
+        if (currentTime - lastSkullTime < skullSpawnInterval) return
+        
+        // Evitar crear más calaveras que el máximo permitido
+        if (skulls.length >= maxSkulls) return
         
         setSkulls(prev => {
           const newSkull = {
@@ -232,11 +246,11 @@ function App() {
           lastSkullTime = currentTime
           return [...prev, newSkull]
         })
-      }, 1000)
+      }, skullSpawnInterval)
 
-      return () => clearInterval(skullInterval)
+      return () => clearInterval(interval)
     }
-  }, [currentIndex])
+  }, [currentIndex, maxSkulls, skullSpawnInterval, skulls.length])
 
   return (
     <div className="App">
