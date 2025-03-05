@@ -110,6 +110,60 @@ docker build -t front-server .
 docker run -p 80:80 front-server
 ```
 
+#### Opción 4: Usando PM2
+
+1. Instalar PM2 globalmente:
+
+```bash
+npm install -g pm2
+```
+
+2. Crear un archivo `ecosystem.config.js` en la raíz del proyecto:
+
+```javascript
+module.exports = {
+  apps: [{
+    name: 'front-server',
+    script: 'serve',
+    env: {
+      PM2_SERVE_PATH: './dist',
+      PM2_SERVE_PORT: 3000,
+      PM2_SERVE_SPA: 'true',
+      PM2_SERVE_HOMEPAGE: '/index.html'
+    }
+  }]
+}
+```
+
+3. Instalar serve como dependencia de producción:
+
+```bash
+npm install serve --save
+```
+
+4. Iniciar la aplicación con PM2:
+
+```bash
+# Iniciar la aplicación
+pm2 start ecosystem.config.js
+
+# Ver logs
+pm2 logs front-server
+
+# Monitorear la aplicación
+pm2 monit
+
+# Reiniciar la aplicación
+pm2 restart front-server
+
+# Detener la aplicación
+pm2 stop front-server
+
+# Configurar inicio automático
+pm2 startup
+pm2 save
+```
+
 ### 3. Variables de entorno
 
 Para producción, puedes crear un archivo `.env.production` con las variables de entorno necesarias:
