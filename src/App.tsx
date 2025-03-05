@@ -295,9 +295,30 @@ function App() {
         })
       }, skullSpawnInterval)
 
-      return () => clearInterval(interval)
+      // Detectar calaveras perdidas
+      const checkMissedSkulls = setInterval(() => {
+        setSkulls(prev => {
+          const updatedSkulls = prev.filter(skull => {
+            const skullElement = document.querySelector(`[data-skull-id="${skull.id}"]`)
+            if (skullElement) {
+              const rect = skullElement.getBoundingClientRect()
+              if (rect.bottom >= window.innerHeight) {
+                handleMissedSkull(skull.id)
+                return false
+              }
+            }
+            return true
+          })
+          return updatedSkulls
+        })
+      }, 100)
+
+      return () => {
+        clearInterval(interval)
+        clearInterval(checkMissedSkulls)
+      }
     }
-  }, [currentIndex, maxSkulls, skullSpawnInterval, skulls.length, gameOver])
+  }, [currentIndex, maxSkulls, skullSpawnInterval, skulls.length, gameOver, handleMissedSkull])
 
   return (
     <div className="App">
@@ -373,6 +394,7 @@ function App() {
         {skulls.map(skull => (
           <div
             key={skull.id}
+            data-skull-id={skull.id}
             className={`skull ${skull.exploding ? 'exploding' : ''}`}
             style={{ 
               left: `${skull.left}%`,
@@ -430,13 +452,24 @@ function App() {
           borderRadius: '10px',
           textAlign: 'center',
           color: '#ff4444',
-          zIndex: 1000
+          zIndex: 1000,
+          border: '2px solid #ff4444',
+          boxShadow: '0 0 20px #ff4444'
         }}>
-          <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>¡GAME OVER!</h2>
+          <h2 style={{ 
+            fontSize: '3rem', 
+            marginBottom: '1rem',
+            textShadow: '0 0 10px #ff4444',
+            animation: 'pulse 1s infinite'
+          }}>¡GAME OVER!!!</h2>
           <p style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>
             Has perdido 10 calaveras
           </p>
-          <p style={{ fontSize: '1.5rem' }}>
+          <p style={{ 
+            fontSize: '2rem',
+            color: '#ff0000',
+            textShadow: '0 0 5px #ff0000'
+          }}>
             Puntuación final: {explodedSkulls}
           </p>
         </div>
