@@ -1,16 +1,16 @@
 .system-info {
-    background-color: rgba(0, 0, 0, 0.8);
-    border: 1px solid #00ff00;
+    background-color: #1a1a1a;
+    border: 1px solid #333;
     border-radius: 5px;
     padding: 20px;
     margin: 20px 0;
-    color: #00ff00;
+    color: #e0e0e0;
     font-family: 'Courier New', monospace;
 }
 
 .system-info h3 {
     margin: 0 0 15px 0;
-    color: #00ff00;
+    color: #e0e0e0;
     text-align: center;
     text-transform: uppercase;
     letter-spacing: 2px;
@@ -26,18 +26,18 @@
     display: flex;
     flex-direction: column;
     padding: 10px;
-    background-color: rgba(0, 255, 0, 0.1);
+    background-color: #333;
     border-radius: 3px;
 }
 
 .info-item .label {
     font-weight: bold;
     margin-bottom: 5px;
-    color: #00ff00;
+    color: #e0e0e0;
 }
 
 .info-item .value {
-    color: #fff;
+    color: #e0e0e0;
     word-break: break-all;
     font-size: 0.9em;
 }
