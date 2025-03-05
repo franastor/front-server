@@ -15,6 +15,8 @@ function App() {
   const [maxSkulls, setMaxSkulls] = useState(3)
   const [skullSpawnInterval, setSkullSpawnInterval] = useState(1000)
   const [bombs, setBombs] = useState(0)
+  const [missedSkulls, setMissedSkulls] = useState(0)
+  const [gameOver, setGameOver] = useState(false)
   const [systemInfo, setSystemInfo] = useState({
     os: 'Detectando...',
     ip: 'Detectando...',
@@ -247,6 +249,18 @@ function App() {
     }, 1500)
   }, [explodedSkulls, skulls])
 
+  // Función para manejar calaveras perdidas
+  const handleMissedSkull = useCallback((skullId: number) => {
+    setMissedSkulls(prev => {
+      const newCount = prev + 1
+      if (newCount >= 10) {
+        setGameOver(true)
+      }
+      return newCount
+    })
+    setSkulls(prev => prev.filter(skull => skull.id !== skullId))
+  }, [])
+
   // Limpiar timeouts al desmontar el componente
   useEffect(() => {
     return () => {
@@ -258,7 +272,7 @@ function App() {
 
   // Optimizar la creación de calaveras
   useEffect(() => {
-    if (currentIndex >= 17) {
+    if (currentIndex >= 17 && !gameOver) {
       let lastSkullTime = Date.now()
       const interval = setInterval(() => {
         const currentTime = Date.now()
@@ -283,7 +297,7 @@ function App() {
 
       return () => clearInterval(interval)
     }
-  }, [currentIndex, maxSkulls, skullSpawnInterval, skulls.length])
+  }, [currentIndex, maxSkulls, skullSpawnInterval, skulls.length, gameOver])
 
   return (
     <div className="App">
@@ -301,6 +315,9 @@ function App() {
           }}>
             <span style={{ fontSize: '1.5rem' }}>💀</span>
             <span>Calaveras explotadas: {explodedSkulls} | Combo: {combo}x</span>
+            <span style={{ marginLeft: '20px', color: '#ff0000' }}>
+              Calaveras perdidas: {missedSkulls}/10
+            </span>
             {bombs > 0 && (
               <div 
                 style={{ 
@@ -402,6 +419,28 @@ function App() {
           </div>
         ))}
       </div>
+      {gameOver && (
+        <div style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          backgroundColor: 'rgba(0, 0, 0, 0.9)',
+          padding: '2rem',
+          borderRadius: '10px',
+          textAlign: 'center',
+          color: '#ff4444',
+          zIndex: 1000
+        }}>
+          <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>¡GAME OVER!</h2>
+          <p style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>
+            Has perdido 10 calaveras
+          </p>
+          <p style={{ fontSize: '1.5rem' }}>
+            Puntuación final: {explodedSkulls}
+          </p>
+        </div>
+      )}
     </div>
   )
 }
