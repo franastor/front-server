@@ -61,7 +61,7 @@ npm install -g pm2
 
 2. Iniciar la aplicación con PM2:
 ```bash
-pm2 start serve --name "front-server" -- dist -l 3000
+pm2 start ./node_modules/.bin/serve --name "front-server" -- dist -l 3000
 ```
 
 Comandos útiles de PM2:
