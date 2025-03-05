@@ -122,8 +122,18 @@ server {
     listen 80;
     server_name tu-dominio.com;  # Reemplazar con tu dominio
 
-    root /var/www/front-server;
-    index index.html;
+    # Configuración del proxy inverso
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
 
     # Compresión GZIP
     gzip on;
@@ -139,14 +149,6 @@ server {
         add_header Cache-Control "public, no-transform";
     }
 
-    # Configuración principal
-    location / {
-        try_files $uri $uri/ /index.html;
-        add_header X-Frame-Options "SAMEORIGIN";
-        add_header X-XSS-Protection "1; mode=block";
-        add_header X-Content-Type-Options "nosniff";
-    }
-
     # Prevenir acceso a archivos ocultos
     location ~ /\. {
         deny all;
@@ -159,83 +161,4 @@ server {
 ```
 
 5. Habilitar el sitio:
-```bash
-# Crear enlace simbólico
-sudo ln -s /etc/nginx/sites-available/front-server /etc/nginx/sites-enabled/
-
-# Eliminar la configuración por defecto si existe
-sudo rm /etc/nginx/sites-enabled/default
-
-# Verificar la configuración
-sudo nginx -t
-
-# Reiniciar Nginx
-sudo systemctl restart nginx
 ```
-
-6. Configurar SSL con Let's Encrypt (opcional pero recomendado):
-```bash
-# Instalar Certbot
-sudo apt install certbot python3-certbot-nginx
-
-# Obtener certificado SSL
-sudo certbot --nginx -d tu-dominio.com
-```
-
-Notas importantes:
-- Reemplaza `tu-dominio.com` con tu dominio real
-- Asegúrate de que los puertos 80 y 443 estén abiertos en tu firewall
-- Para desarrollo local, puedes usar `localhost` como server_name
-- La configuración incluye optimizaciones de rendimiento y seguridad
-
-#### Opción 3: Usando Docker
-
-1. Crear un Dockerfile:
-
-```dockerfile
-FROM node:18-alpine as build
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-```
-
-2. Construir y ejecutar el contenedor:
-
-```bash
-# Construir la imagen
-docker build -t front-server .
-
-# Ejecutar el contenedor
-docker run -p 80:80 front-server
-```
-
-### 3. Variables de entorno
-
-Para producción, puedes crear un archivo `.env.production` con las variables de entorno necesarias:
-
-```env
-VITE_API_URL=https://tu-api.com
-```
-
-### 4. Optimizaciones recomendadas
-
-- Configurar un CDN para servir los archivos estáticos
-- Habilitar compresión GZIP en el servidor
-- Configurar caché del navegador
-- Implementar HTTPS
-- Configurar monitoreo y logs
-
-### 5. Monitoreo
-
-Para monitorear la aplicación en producción, puedes usar servicios como:
-- Google Analytics
-- Sentry para tracking de errores
-- LogRocket para análisis de usuario
-- New Relic para monitoreo de rendimiento
