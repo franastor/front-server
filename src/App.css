@@ -222,21 +222,21 @@
   color: #ff4444;
   opacity: 0;
   pointer-events: auto;
-  animation: skullFall 5s linear forwards;
+  animation: skullFall 8s linear forwards;
   z-index: 1000;
   cursor: pointer;
 }
 
 .skull.exploding {
-  animation: explode 0.5s ease-out forwards;
+  animation: explode 0.8s ease-out forwards;
 }
 
 .explosion-particle {
   position: absolute;
-  font-size: 1rem;
+  font-size: 1.5rem;
   color: #ff4444;
   pointer-events: none;
-  animation: particleFly 1s ease-out forwards;
+  animation: particleFly 1.5s ease-out forwards;
 }
 
 @keyframes explode {
@@ -245,7 +245,7 @@
     opacity: 1;
   }
   50% {
-    transform: scale(2) rotate(180deg);
+    transform: scale(3) rotate(180deg);
     opacity: 0.5;
   }
   100% {

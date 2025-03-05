@@ -144,16 +144,16 @@ function App() {
     ))
 
     // Crear partículas de explosión
-    const newParticles = Array.from({ length: 8 }, (_, i) => {
-      const angle = (i * 45) * Math.PI / 180
-      const distance = 100
+    const newParticles = Array.from({ length: 12 }, (_, i) => {
+      const angle = (i * 30) * Math.PI / 180
+      const distance = 200
       return {
         id: Date.now() + i,
         left,
         top,
         tx: Math.cos(angle) * distance,
         ty: Math.sin(angle) * distance,
-        r: Math.random() * 360
+        r: Math.random() * 720
       }
     })
 
@@ -163,7 +163,7 @@ function App() {
     setTimeout(() => {
       setSkulls(prev => prev.filter(skull => skull.id !== skullId))
       setParticles(prev => prev.filter(particle => !newParticles.find(p => p.id === particle.id)))
-    }, 1000)
+    }, 1500)
   }
 
   return (
