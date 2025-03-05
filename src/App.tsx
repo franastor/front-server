@@ -14,7 +14,7 @@ function App() {
   })
   
   const commands = [
-    { text: 'Bienvenido al mundo de Franastor', delay: 100 },
+    { text: 'Relajate y disfruta', delay: 100 },
     { text: 'Iniciando secuencia de acceso...', delay: 2000 },
     { text: 'Detectando sistema operativo...', delay: 2000 },
     { text: `Sistema: ${systemInfo.os}`, delay: 2000 },
