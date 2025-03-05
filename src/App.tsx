@@ -14,7 +14,7 @@ function App() {
   })
   
   const commands = [
-    { text: 'Bienvenido al mundo franastor', delay: 100 },
+    { text: 'Bienvenido al mundo de Franastor', delay: 100 },
     { text: 'Iniciando secuencia de acceso...', delay: 2000 },
     { text: 'Detectando sistema operativo...', delay: 2000 },
     { text: `Sistema: ${systemInfo.os}`, delay: 2000 },
@@ -31,7 +31,8 @@ function App() {
     { text: 'Sistema comprometido exitosamente', delay: 2000 },
     { text: 'Iniciando descarga de archivos...', delay: 2000 },
     { text: 'Instalando malware...', delay: 2000 },
-    { text: 'Proceso completado', delay: 2000 }
+    { text: 'Proceso completado', delay: 2000 },
+    { text: 'Has sido Hackeado!!!! Estas en mi poder!!!!', delay: 3000 }
   ]
 
   useEffect(() => {
