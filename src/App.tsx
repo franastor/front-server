@@ -133,11 +133,11 @@ function App() {
     }
   }, [currentIndex])
 
-  // Función optimizada para manejar clics en calaveras
-  const handleSkullClick = useCallback((skullId: number, left: number, top: number) => {
+  // Función optimizada para manejar clics y toques en calaveras
+  const handleSkullInteraction = useCallback((skullId: number, left: number, top: number) => {
     const currentTime = Date.now()
     
-    // Evitar clics múltiples en la misma calavera
+    // Evitar interacciones múltiples en la misma calavera
     if (currentTime - lastClickTimeRef.current < 100) return
     lastClickTimeRef.current = currentTime
 
@@ -295,7 +295,14 @@ function App() {
               left: `${skull.left}%`,
               animationDuration: `${skullSpeed}s`
             }}
-            onClick={() => handleSkullClick(skull.id, skull.left, 0)}
+            onClick={() => handleSkullInteraction(skull.id, skull.left, 0)}
+            onTouchStart={(e) => {
+              e.preventDefault(); // Prevenir el scroll
+              handleSkullInteraction(skull.id, skull.left, 0);
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault(); // Prevenir el scroll
+            }}
           >
             💀
           </div>
