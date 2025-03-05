@@ -8,6 +8,10 @@ function App() {
   const [downloadProgress, setDownloadProgress] = useState(0)
   const [skulls, setSkulls] = useState<Array<{ id: number, left: number, exploding: boolean }>>([])
   const [particles, setParticles] = useState<Array<{ id: number, left: number, top: number, tx: number, ty: number, r: number }>>([])
+  const [explodedSkulls, setExplodedSkulls] = useState(0)
+  const [combo, setCombo] = useState(0)
+  const [comboText, setComboText] = useState<Array<{ id: number, text: string }>>([])
+  const [skullSpeed, setSkullSpeed] = useState(8)
   const [systemInfo, setSystemInfo] = useState({
     os: 'Detectando...',
     ip: 'Detectando...',
@@ -159,6 +163,25 @@ function App() {
 
     setParticles(prev => [...prev, ...newParticles])
 
+    // Actualizar contador y combo
+    setExplodedSkulls(prev => prev + 1)
+    setCombo(prev => {
+      const newCombo = prev + 1
+      if (newCombo >= 3) {
+        const comboText = `${newCombo}x COMBO!`
+        setComboText(prev => [...prev, { id: Date.now(), text: comboText }])
+        setTimeout(() => {
+          setComboText(prev => prev.filter(text => text.id !== Date.now()))
+        }, 1000)
+      }
+      return newCombo
+    })
+
+    // Aumentar velocidad cada 5 calaveras
+    if ((explodedSkulls + 1) % 5 === 0) {
+      setSkullSpeed(prev => Math.max(prev - 1, 3))
+    }
+
     // Eliminar la calavera y las partículas después de la animación
     setTimeout(() => {
       setSkulls(prev => prev.filter(skull => skull.id !== skullId))
@@ -170,6 +193,9 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>Bienvenido al mundo de Franastor</h1>
+        <div style={{ marginTop: '10px', fontSize: '1.2rem', color: '#ff4444' }}>
+          Calaveras explotadas: {explodedSkulls} | Combo: {combo}x
+        </div>
       </header>
       <div className="terminal-container">
         <div className="terminal">
@@ -204,7 +230,10 @@ function App() {
         <div
           key={skull.id}
           className={`skull ${skull.exploding ? 'exploding' : ''}`}
-          style={{ left: `${skull.left}%` }}
+          style={{ 
+            left: `${skull.left}%`,
+            animationDuration: `${skullSpeed}s`
+          }}
           onClick={() => handleSkullClick(skull.id, skull.left, 0)}
         >
           💀
@@ -223,6 +252,19 @@ function App() {
           } as React.CSSProperties}
         >
           💀
+        </div>
+      ))}
+      {comboText.map(text => (
+        <div
+          key={text.id}
+          className="combo-text"
+          style={{
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)'
+          }}
+        >
+          {text.text}
         </div>
       ))}
     </div>
