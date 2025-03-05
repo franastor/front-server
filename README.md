@@ -88,23 +88,105 @@ pm2 save
 
 #### Opción 2: Usando Nginx
 
-1. Instalar Nginx en tu servidor
-2. Copiar los archivos de la carpeta `dist` a la carpeta de Nginx (normalmente `/var/www/html/`)
-3. Configurar Nginx para servir la aplicación:
+1. Instalar Nginx en tu servidor:
+```bash
+# En Ubuntu/Debian
+sudo apt update
+sudo apt install nginx
 
+# En CentOS/RHEL
+sudo yum install nginx
+```
+
+2. Copiar los archivos de la carpeta `dist` a la carpeta de Nginx:
+```bash
+# Crear directorio para la aplicación
+sudo mkdir -p /var/www/front-server
+
+# Copiar los archivos de la build
+sudo cp -r dist/* /var/www/front-server/
+
+# Asignar permisos correctos
+sudo chown -R www-data:www-data /var/www/front-server
+sudo chmod -R 755 /var/www/front-server
+```
+
+3. Crear un archivo de configuración para Nginx:
+```bash
+sudo nano /etc/nginx/sites-available/front-server
+```
+
+4. Copiar la siguiente configuración (también disponible en `nginx.conf` en la raíz del proyecto):
 ```nginx
 server {
     listen 80;
-    server_name tu-dominio.com;
+    server_name tu-dominio.com;  # Reemplazar con tu dominio
 
-    root /var/www/html;
+    root /var/www/front-server;
     index index.html;
 
+    # Compresión GZIP
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 10240;
+    gzip_proxied expired no-cache no-store private auth;
+    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml application/javascript;
+    gzip_disable "MSIE [1-6]\.";
+
+    # Caché del navegador
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+        expires 30d;
+        add_header Cache-Control "public, no-transform";
+    }
+
+    # Configuración principal
     location / {
         try_files $uri $uri/ /index.html;
+        add_header X-Frame-Options "SAMEORIGIN";
+        add_header X-XSS-Protection "1; mode=block";
+        add_header X-Content-Type-Options "nosniff";
     }
+
+    # Prevenir acceso a archivos ocultos
+    location ~ /\. {
+        deny all;
+    }
+
+    # Optimización de seguridad
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin";
 }
 ```
+
+5. Habilitar el sitio:
+```bash
+# Crear enlace simbólico
+sudo ln -s /etc/nginx/sites-available/front-server /etc/nginx/sites-enabled/
+
+# Eliminar la configuración por defecto si existe
+sudo rm /etc/nginx/sites-enabled/default
+
+# Verificar la configuración
+sudo nginx -t
+
+# Reiniciar Nginx
+sudo systemctl restart nginx
+```
+
+6. Configurar SSL con Let's Encrypt (opcional pero recomendado):
+```bash
+# Instalar Certbot
+sudo apt install certbot python3-certbot-nginx
+
+# Obtener certificado SSL
+sudo certbot --nginx -d tu-dominio.com
+```
+
+Notas importantes:
+- Reemplaza `tu-dominio.com` con tu dominio real
+- Asegúrate de que los puertos 80 y 443 estén abiertos en tu firewall
+- Para desarrollo local, puedes usar `localhost` como server_name
+- La configuración incluye optimizaciones de rendimiento y seguridad
 
 #### Opción 3: Usando Docker
 
