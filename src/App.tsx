@@ -6,6 +6,7 @@ function App() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [loading, setLoading] = useState(0)
   const [downloadProgress, setDownloadProgress] = useState(0)
+  const [skulls, setSkulls] = useState<Array<{ id: number, left: number }>>([])
   const [systemInfo, setSystemInfo] = useState({
     os: 'Detectando...',
     ip: 'Detectando...',
@@ -118,6 +119,22 @@ function App() {
     }
   }, [currentIndex])
 
+  useEffect(() => {
+    if (currentIndex >= 17) { // Cuando llegue a "Proceso completado"
+      const skullInterval = setInterval(() => {
+        setSkulls(prev => {
+          const newSkull = {
+            id: Date.now(),
+            left: Math.random() * 100
+          }
+          return [...prev, newSkull]
+        })
+      }, 500)
+
+      return () => clearInterval(skullInterval)
+    }
+  }, [currentIndex])
+
   return (
     <div className="App">
       <header className="App-header">
@@ -155,6 +172,15 @@ function App() {
           </div>
         </div>
       </div>
+      {skulls.map(skull => (
+        <div
+          key={skull.id}
+          className="skull"
+          style={{ left: `${skull.left}%` }}
+        >
+          💀
+        </div>
+      ))}
     </div>
   )
 }
