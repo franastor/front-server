@@ -5,6 +5,7 @@ function App() {
   const [currentLine, setCurrentLine] = useState('')
   const [currentIndex, setCurrentIndex] = useState(0)
   const [loading, setLoading] = useState(0)
+  const [downloadProgress, setDownloadProgress] = useState(0)
   const [systemInfo, setSystemInfo] = useState({
     os: 'Detectando...',
     ip: 'Detectando...',
@@ -26,7 +27,10 @@ function App() {
     { text: 'Acceso SSH concedido', delay: 2000 },
     { text: `Conectado como: franastor@${systemInfo.ip}`, delay: 2000 },
     { text: 'Acceso al sistema completado', delay: 2000 },
-    { text: 'Sistema comprometido exitosamente', delay: 2000 }
+    { text: 'Sistema comprometido exitosamente', delay: 2000 },
+    { text: 'Iniciando descarga de archivos...', delay: 2000 },
+    { text: 'Instalando malware...', delay: 2000 },
+    { text: 'Proceso completado', delay: 2000 }
   ]
 
   useEffect(() => {
@@ -101,6 +105,19 @@ function App() {
     }
   }, [currentIndex])
 
+  useEffect(() => {
+    if (currentIndex >= 15) { // Cuando llegue a "Iniciando descarga de archivos..."
+      const downloadInterval = setInterval(() => {
+        setDownloadProgress(prev => {
+          if (prev >= 100) return 100
+          return prev + 1
+        })
+      }, 30)
+
+      return () => clearInterval(downloadInterval)
+    }
+  }, [currentIndex])
+
   return (
     <div className="App">
       <header className="App-header">
@@ -125,6 +142,14 @@ function App() {
                   <div className="loading-progress" style={{ width: `${loading}%` }}></div>
                 </div>
                 <span className="loading-text">{loading}%</span>
+              </div>
+            )}
+            {currentIndex >= 15 && (
+              <div className="download-container">
+                <div className="download-bar">
+                  <div className="download-progress" style={{ width: `${downloadProgress}%` }}></div>
+                </div>
+                <span className="download-text">Descargando archivos: {downloadProgress}%</span>
               </div>
             )}
           </div>
