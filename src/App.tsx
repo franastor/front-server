@@ -6,7 +6,8 @@ function App() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [loading, setLoading] = useState(0)
   const [downloadProgress, setDownloadProgress] = useState(0)
-  const [skulls, setSkulls] = useState<Array<{ id: number, left: number }>>([])
+  const [skulls, setSkulls] = useState<Array<{ id: number, left: number, exploding: boolean }>>([])
+  const [particles, setParticles] = useState<Array<{ id: number, left: number, top: number, tx: number, ty: number, r: number }>>([])
   const [systemInfo, setSystemInfo] = useState({
     os: 'Detectando...',
     ip: 'Detectando...',
@@ -125,7 +126,8 @@ function App() {
         setSkulls(prev => {
           const newSkull = {
             id: Date.now(),
-            left: Math.random() * 100
+            left: Math.random() * 100,
+            exploding: false
           }
           return [...prev, newSkull]
         })
@@ -134,6 +136,35 @@ function App() {
       return () => clearInterval(skullInterval)
     }
   }, [currentIndex])
+
+  const handleSkullClick = (skullId: number, left: number, top: number) => {
+    // Marcar la calavera como explotando
+    setSkulls(prev => prev.map(skull => 
+      skull.id === skullId ? { ...skull, exploding: true } : skull
+    ))
+
+    // Crear partículas de explosión
+    const newParticles = Array.from({ length: 8 }, (_, i) => {
+      const angle = (i * 45) * Math.PI / 180
+      const distance = 100
+      return {
+        id: Date.now() + i,
+        left,
+        top,
+        tx: Math.cos(angle) * distance,
+        ty: Math.sin(angle) * distance,
+        r: Math.random() * 360
+      }
+    })
+
+    setParticles(prev => [...prev, ...newParticles])
+
+    // Eliminar la calavera y las partículas después de la animación
+    setTimeout(() => {
+      setSkulls(prev => prev.filter(skull => skull.id !== skullId))
+      setParticles(prev => prev.filter(particle => !newParticles.find(p => p.id === particle.id)))
+    }, 1000)
+  }
 
   return (
     <div className="App">
@@ -172,8 +203,24 @@ function App() {
       {skulls.map(skull => (
         <div
           key={skull.id}
-          className="skull"
+          className={`skull ${skull.exploding ? 'exploding' : ''}`}
           style={{ left: `${skull.left}%` }}
+          onClick={() => handleSkullClick(skull.id, skull.left, 0)}
+        >
+          💀
+        </div>
+      ))}
+      {particles.map(particle => (
+        <div
+          key={particle.id}
+          className="explosion-particle"
+          style={{
+            left: `${particle.left}%`,
+            top: `${particle.top}%`,
+            '--tx': `${particle.tx}px`,
+            '--ty': `${particle.ty}px`,
+            '--r': `${particle.r}deg`
+          } as React.CSSProperties}
         >
           💀
         </div>
