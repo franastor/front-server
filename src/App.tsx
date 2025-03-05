@@ -272,7 +272,7 @@ function App() {
           const isPirate = Math.random() < 0.1 // 10% de probabilidad de calavera pirata
           const newSkull = {
             id: currentTime,
-            left: Math.random() * 100,
+            left: Math.random() * 60 + 20, // Entre 20% y 80% del ancho
             exploding: false,
             isPirate
           }
@@ -370,7 +370,7 @@ function App() {
               e.preventDefault();
             }}
           >
-            {skull.isPirate ? '🏴‍☠️' : '💀'}
+            {skull.isPirate ? '👨‍🦯' : '💀'}
           </div>
         ))}
         {particles.map(particle => (
