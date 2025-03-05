@@ -14,7 +14,6 @@ function App() {
   })
   
   const commands = [
-    { text: 'Relajate y disfruta', delay: 100 },
     { text: 'Iniciando secuencia de acceso...', delay: 2000 },
     { text: 'Detectando sistema operativo...', delay: 2000 },
     { text: `Sistema: ${systemInfo.os}`, delay: 2000 },
@@ -108,7 +107,7 @@ function App() {
   }, [currentIndex])
 
   useEffect(() => {
-    if (currentIndex >= 15) { // Cuando llegue a "Iniciando descarga de archivos..."
+    if (currentIndex >= 14) { // Cuando llegue a "Iniciando descarga de archivos..."
       const downloadInterval = setInterval(() => {
         setDownloadProgress(prev => {
           if (prev >= 100) return 100
@@ -139,7 +138,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Ejecutando Terminal Remoto</h1>
+        <h1>Bienvenido al mundo de Franastor</h1>
       </header>
       <div className="terminal-container">
         <div className="terminal">
@@ -147,9 +146,6 @@ function App() {
             <span className="terminal-title">franastor@terminal:~$</span>
           </div>
           <div className="terminal-content">
-            <div className="welcome-line">
-              <span className="command">{commands[0].text}</span>
-            </div>
             <div className="command-line">
               <span className="prompt">$</span>
               <span className="command">{currentLine}</span>
@@ -162,7 +158,7 @@ function App() {
                 <span className="loading-text">{loading}%</span>
               </div>
             )}
-            {currentIndex >= 15 && (
+            {currentIndex >= 14 && (
               <div className="download-container">
                 <div className="download-bar">
                   <div className="download-progress" style={{ width: `${downloadProgress}%` }}></div>
