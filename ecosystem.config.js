@@ -1,12 +1,10 @@
-export default {
+module.exports = {
   apps: [{
     name: 'front-server',
-    script: './node_modules/.bin/serve',
+    script: 'npx',
+    args: 'serve -s dist -l 3000',
     env: {
-      PM2_SERVE_PATH: './dist',
-      PM2_SERVE_PORT: 3000,
-      PM2_SERVE_SPA: 'true',
-      PM2_SERVE_HOMEPAGE: '/index.html'
+      NODE_ENV: 'production'
     }
   }]
 } 
