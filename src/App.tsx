@@ -129,7 +129,7 @@ function App() {
           }
           return [...prev, newSkull]
         })
-      }, 500)
+      }, 1000)
 
       return () => clearInterval(skullInterval)
     }

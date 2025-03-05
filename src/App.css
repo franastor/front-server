@@ -216,7 +216,7 @@
   color: #ff4444;
   opacity: 0;
   pointer-events: none;
-  animation: skullFall 3s linear forwards;
+  animation: skullFall 5s linear forwards;
   z-index: 1000;
 }
 
