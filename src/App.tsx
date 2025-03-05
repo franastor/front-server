@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import './App.css'
 
 function App() {
@@ -38,6 +38,15 @@ function App() {
     { text: 'Proceso completado', delay: 2000 },
     { text: 'Has sido Hackeado!!!! Estas en mi poder!!!!', delay: 3000 }
   ]
+
+  // Referencia para el contenedor de calaveras
+  const skullsContainerRef = useRef<HTMLDivElement>(null)
+  
+  // Referencia para el último tiempo de clic
+  const lastClickTimeRef = useRef(0)
+  
+  // Referencia para el contador de combo
+  const comboTimeoutRef = useRef<ReturnType<typeof setTimeout>>()
 
   useEffect(() => {
     // Detectar sistema operativo y navegador
@@ -124,24 +133,14 @@ function App() {
     }
   }, [currentIndex])
 
-  useEffect(() => {
-    if (currentIndex >= 17) { // Cuando llegue a "Proceso completado"
-      const skullInterval = setInterval(() => {
-        setSkulls(prev => {
-          const newSkull = {
-            id: Date.now(),
-            left: Math.random() * 100,
-            exploding: false
-          }
-          return [...prev, newSkull]
-        })
-      }, 1000)
+  // Función optimizada para manejar clics en calaveras
+  const handleSkullClick = useCallback((skullId: number, left: number, top: number) => {
+    const currentTime = Date.now()
+    
+    // Evitar clics múltiples en la misma calavera
+    if (currentTime - lastClickTimeRef.current < 100) return
+    lastClickTimeRef.current = currentTime
 
-      return () => clearInterval(skullInterval)
-    }
-  }, [currentIndex])
-
-  const handleSkullClick = (skullId: number, left: number, top: number) => {
     // Marcar la calavera como explotando
     setSkulls(prev => prev.map(skull => 
       skull.id === skullId ? { ...skull, exploding: true } : skull
@@ -165,15 +164,32 @@ function App() {
 
     // Actualizar contador y combo
     setExplodedSkulls(prev => prev + 1)
+    
+    // Manejar el combo con un timeout
     setCombo(prev => {
       const newCombo = prev + 1
+      
+      // Limpiar el timeout anterior si existe
+      if (comboTimeoutRef.current) {
+        clearTimeout(comboTimeoutRef.current)
+      }
+      
+      // Mostrar texto de combo si es >= 3
       if (newCombo >= 3) {
         const comboText = `${newCombo}x COMBO!`
         setComboText(prev => [...prev, { id: Date.now(), text: comboText }])
+        
+        // Eliminar el texto después de la animación
         setTimeout(() => {
           setComboText(prev => prev.filter(text => text.id !== Date.now()))
         }, 1000)
       }
+      
+      // Resetear el combo después de 2 segundos
+      comboTimeoutRef.current = setTimeout(() => {
+        setCombo(0)
+      }, 2000)
+      
       return newCombo
     })
 
@@ -187,7 +203,40 @@ function App() {
       setSkulls(prev => prev.filter(skull => skull.id !== skullId))
       setParticles(prev => prev.filter(particle => !newParticles.find(p => p.id === particle.id)))
     }, 1500)
-  }
+  }, [explodedSkulls])
+
+  // Limpiar timeouts al desmontar el componente
+  useEffect(() => {
+    return () => {
+      if (comboTimeoutRef.current) {
+        clearTimeout(comboTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  // Optimizar la creación de calaveras
+  useEffect(() => {
+    if (currentIndex >= 17) {
+      let lastSkullTime = Date.now()
+      const skullInterval = setInterval(() => {
+        const currentTime = Date.now()
+        // Evitar crear calaveras si la última fue hace menos de 500ms
+        if (currentTime - lastSkullTime < 500) return
+        
+        setSkulls(prev => {
+          const newSkull = {
+            id: currentTime,
+            left: Math.random() * 100,
+            exploding: false
+          }
+          lastSkullTime = currentTime
+          return [...prev, newSkull]
+        })
+      }, 1000)
+
+      return () => clearInterval(skullInterval)
+    }
+  }, [currentIndex])
 
   return (
     <div className="App">
@@ -237,47 +286,49 @@ function App() {
           </div>
         </div>
       </div>
-      {skulls.map(skull => (
-        <div
-          key={skull.id}
-          className={`skull ${skull.exploding ? 'exploding' : ''}`}
-          style={{ 
-            left: `${skull.left}%`,
-            animationDuration: `${skullSpeed}s`
-          }}
-          onClick={() => handleSkullClick(skull.id, skull.left, 0)}
-        >
-          💀
-        </div>
-      ))}
-      {particles.map(particle => (
-        <div
-          key={particle.id}
-          className="explosion-particle"
-          style={{
-            left: `${particle.left}%`,
-            top: `${particle.top}%`,
-            '--tx': `${particle.tx}px`,
-            '--ty': `${particle.ty}px`,
-            '--r': `${particle.r}deg`
-          } as React.CSSProperties}
-        >
-          💀
-        </div>
-      ))}
-      {comboText.map(text => (
-        <div
-          key={text.id}
-          className="combo-text"
-          style={{
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%, -50%)'
-          }}
-        >
-          {text.text}
-        </div>
-      ))}
+      <div ref={skullsContainerRef}>
+        {skulls.map(skull => (
+          <div
+            key={skull.id}
+            className={`skull ${skull.exploding ? 'exploding' : ''}`}
+            style={{ 
+              left: `${skull.left}%`,
+              animationDuration: `${skullSpeed}s`
+            }}
+            onClick={() => handleSkullClick(skull.id, skull.left, 0)}
+          >
+            💀
+          </div>
+        ))}
+        {particles.map(particle => (
+          <div
+            key={particle.id}
+            className="explosion-particle"
+            style={{
+              left: `${particle.left}%`,
+              top: `${particle.top}%`,
+              '--tx': `${particle.tx}px`,
+              '--ty': `${particle.ty}px`,
+              '--r': `${particle.r}deg`
+            } as React.CSSProperties}
+          >
+            💀
+          </div>
+        ))}
+        {comboText.map(text => (
+          <div
+            key={text.id}
+            className="combo-text"
+            style={{
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)'
+            }}
+          >
+            {text.text}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
