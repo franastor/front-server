@@ -14,6 +14,7 @@ function App() {
   const [skullSpeed, setSkullSpeed] = useState(8)
   const [maxSkulls, setMaxSkulls] = useState(3)
   const [skullSpawnInterval, setSkullSpawnInterval] = useState(1000)
+  const [bombs, setBombs] = useState(0)
   const [systemInfo, setSystemInfo] = useState({
     os: 'Detectando...',
     ip: 'Detectando...',
@@ -135,6 +136,31 @@ function App() {
     }
   }, [currentIndex])
 
+  // Función para detonar todas las calaveras
+  const detonateAllSkulls = useCallback(() => {
+    if (bombs <= 0) return;
+
+    // Crear partículas de explosión para cada calavera
+    const newParticles = skulls.flatMap(skull => 
+      Array.from({ length: 12 }, (_, i) => {
+        const angle = (i * 30) * Math.PI / 180
+        const distance = 200
+        return {
+          id: Date.now() + i + skull.id,
+          left: skull.left,
+          top: 0,
+          tx: Math.cos(angle) * distance,
+          ty: Math.sin(angle) * distance,
+          r: Math.random() * 720
+        }
+      })
+    )
+
+    setParticles(prev => [...prev, ...newParticles])
+    setSkulls([])
+    setBombs(prev => prev - 1)
+  }, [bombs, skulls])
+
   // Función optimizada para manejar clics y toques en calaveras
   const handleSkullInteraction = useCallback((skullId: number, left: number, top: number) => {
     const currentTime = Date.now()
@@ -207,6 +233,7 @@ function App() {
       setSkullSpeed(prev => Math.max(prev - 0.5, 3))
       setMaxSkulls(prev => Math.min(prev + 1, 8))
       setSkullSpawnInterval(prev => Math.max(prev - 100, 300))
+      setBombs(prev => prev + 1)
     }
 
     // Eliminar la calavera y las partículas después de la animación
@@ -268,6 +295,25 @@ function App() {
           }}>
             <span style={{ fontSize: '1.5rem' }}>💀</span>
             <span>Calaveras explotadas: {explodedSkulls} | Combo: {combo}x</span>
+            {bombs > 0 && (
+              <div 
+                style={{ 
+                  marginLeft: '20px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px'
+                }}
+                onClick={detonateAllSkulls}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  detonateAllSkulls();
+                }}
+              >
+                <span style={{ fontSize: '1.5rem' }}>💣</span>
+                <span>x{bombs}</span>
+              </div>
+            )}
           </div>
         )}
       </header>
