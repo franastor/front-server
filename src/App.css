@@ -226,14 +226,24 @@
   z-index: 1000;
   cursor: pointer;
   transition: transform 0.2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .skull:hover {
   transform: scale(1.2);
 }
 
+.skull:active {
+  transform: scale(0.95);
+}
+
 .skull.exploding {
   animation: explode 0.8s ease-out forwards;
+  pointer-events: none;
 }
 
 .explosion-particle {
@@ -242,6 +252,10 @@
   color: #ff4444;
   pointer-events: none;
   animation: particleFly 1.5s ease-out forwards;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 .combo-text {
