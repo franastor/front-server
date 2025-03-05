@@ -11,7 +11,7 @@ function App() {
   const [explodedSkulls, setExplodedSkulls] = useState(0)
   const [combo, setCombo] = useState(0)
   const [comboText, setComboText] = useState<Array<{ id: number, text: string }>>([])
-  const [skullSpeed, setSkullSpeed] = useState(8)
+  const [skullSpeed, setSkullSpeed] = useState(12)
   const [maxSkulls, setMaxSkulls] = useState(3)
   const [skullSpawnInterval, setSkullSpawnInterval] = useState(1000)
   const [bombs, setBombs] = useState(0)
@@ -209,9 +209,9 @@ function App() {
         
         // Aumentar dificultad basada en el combo
         if (newCombo >= 5) {
-          setSkullSpeed(prev => Math.max(prev - 0.5, 3))
+          setSkullSpeed(prev => Math.max(prev - 1, 4))
           setMaxSkulls(prev => Math.min(prev + 1, 8))
-          setSkullSpawnInterval(prev => Math.max(prev - 100, 300))
+          setSkullSpawnInterval(prev => Math.max(prev - 150, 200))
         }
         
         // Eliminar el texto después de la animación
@@ -230,9 +230,9 @@ function App() {
 
     // Aumentar dificultad base cada 10 calaveras
     if ((explodedSkulls + 1) % 10 === 0) {
-      setSkullSpeed(prev => Math.max(prev - 0.5, 3))
+      setSkullSpeed(prev => Math.max(prev - 1, 4))
       setMaxSkulls(prev => Math.min(prev + 1, 8))
-      setSkullSpawnInterval(prev => Math.max(prev - 100, 300))
+      setSkullSpawnInterval(prev => Math.max(prev - 150, 200))
       setBombs(prev => prev + 1)
     }
 
