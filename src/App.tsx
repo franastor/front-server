@@ -6,7 +6,7 @@ function App() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [loading, setLoading] = useState(0)
   const [downloadProgress, setDownloadProgress] = useState(0)
-  const [skulls, setSkulls] = useState<Array<{ id: number, left: number, exploding: boolean }>>([])
+  const [skulls, setSkulls] = useState<Array<{ id: number, left: number, exploding: boolean, isPirate: boolean }>>([])
   const [particles, setParticles] = useState<Array<{ id: number, left: number, top: number, tx: number, ty: number, r: number }>>([])
   const [explodedSkulls, setExplodedSkulls] = useState(0)
   const [combo, setCombo] = useState(0)
@@ -191,7 +191,9 @@ function App() {
     setParticles(prev => [...prev, ...newParticles])
 
     // Actualizar contador y combo
-    setExplodedSkulls(prev => prev + 1)
+    const skull = skulls.find(s => s.id === skullId)
+    const points = skull?.isPirate ? 5 : 1
+    setExplodedSkulls(prev => prev + points)
     
     // Manejar el combo con un timeout
     setCombo(prev => {
@@ -228,11 +230,13 @@ function App() {
       return newCombo
     })
 
-    // Aumentar dificultad base cada 10 calaveras
-    if ((explodedSkulls + 1) % 10 === 0) {
+    // Reducir el intervalo entre calaveras con cada calavera explotada
+    setSkullSpawnInterval(prev => Math.max(prev - 50, 200))
+
+    // Aumentar dificultad base cada 5 calaveras
+    if ((explodedSkulls + points) % 5 === 0) {
       setSkullSpeed(prev => Math.max(prev - 1, 4))
       setMaxSkulls(prev => Math.min(prev + 1, 8))
-      setSkullSpawnInterval(prev => Math.max(prev - 150, 200))
       setBombs(prev => prev + 1)
     }
 
@@ -241,7 +245,7 @@ function App() {
       setSkulls(prev => prev.filter(skull => skull.id !== skullId))
       setParticles(prev => prev.filter(particle => !newParticles.find(p => p.id === particle.id)))
     }, 1500)
-  }, [explodedSkulls])
+  }, [explodedSkulls, skulls])
 
   // Limpiar timeouts al desmontar el componente
   useEffect(() => {
@@ -265,10 +269,12 @@ function App() {
         if (skulls.length >= maxSkulls) return
         
         setSkulls(prev => {
+          const isPirate = Math.random() < 0.1 // 10% de probabilidad de calavera pirata
           const newSkull = {
             id: currentTime,
             left: Math.random() * 100,
-            exploding: false
+            exploding: false,
+            isPirate
           }
           lastSkullTime = currentTime
           return [...prev, newSkull]
@@ -353,18 +359,18 @@ function App() {
             className={`skull ${skull.exploding ? 'exploding' : ''}`}
             style={{ 
               left: `${skull.left}%`,
-              animationDuration: `${skullSpeed}s`
+              animationDuration: `${skull.isPirate ? skullSpeed * 0.5 : skullSpeed}s`
             }}
             onClick={() => handleSkullInteraction(skull.id, skull.left, 0)}
             onTouchStart={(e) => {
-              e.preventDefault(); // Prevenir el scroll
+              e.preventDefault();
               handleSkullInteraction(skull.id, skull.left, 0);
             }}
             onTouchEnd={(e) => {
-              e.preventDefault(); // Prevenir el scroll
+              e.preventDefault();
             }}
           >
-            💀
+            {skull.isPirate ? '🏴‍☠️' : '💀'}
           </div>
         ))}
         {particles.map(particle => (
