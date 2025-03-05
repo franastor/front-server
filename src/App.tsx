@@ -52,7 +52,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Terminal Simulator</h1>
+        <h1>Ejecutando Terminal Remoto</h1>
         <SystemInfo />
       </header>
       <div className="terminal-container">
