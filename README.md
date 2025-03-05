@@ -52,14 +52,38 @@ Esto creará una carpeta `dist` con los archivos optimizados para producción.
 
 Hay varias opciones para desplegar la aplicación:
 
-#### Opción 1: Usando un servidor estático (recomendado)
+#### Opción 1: Usando PM2 (recomendado)
 
+1. Instalar PM2 globalmente:
 ```bash
-# Instalar un servidor estático (por ejemplo, serve)
-npm install -g serve
+npm install -g pm2
+```
 
-# Servir la aplicación
-serve -s dist
+2. Iniciar la aplicación con PM2:
+```bash
+pm2 start serve --name "front-server" -- dist -l 3000
+```
+
+Comandos útiles de PM2:
+```bash
+# Ver logs
+pm2 logs front-server
+
+# Ver estado
+pm2 status
+
+# Reiniciar la aplicación
+pm2 restart front-server
+
+# Detener la aplicación
+pm2 stop front-server
+
+# Eliminar la aplicación
+pm2 delete front-server
+
+# Configurar inicio automático
+pm2 startup
+pm2 save
 ```
 
 #### Opción 2: Usando Nginx
@@ -108,60 +132,6 @@ docker build -t front-server .
 
 # Ejecutar el contenedor
 docker run -p 80:80 front-server
-```
-
-#### Opción 4: Usando PM2
-
-1. Instalar PM2 globalmente:
-
-```bash
-npm install -g pm2
-```
-
-2. Crear un archivo `ecosystem.config.js` en la raíz del proyecto:
-
-```javascript
-module.exports = {
-  apps: [{
-    name: 'front-server',
-    script: 'serve',
-    env: {
-      PM2_SERVE_PATH: './dist',
-      PM2_SERVE_PORT: 3000,
-      PM2_SERVE_SPA: 'true',
-      PM2_SERVE_HOMEPAGE: '/index.html'
-    }
-  }]
-}
-```
-
-3. Instalar serve como dependencia de producción:
-
-```bash
-npm install serve --save
-```
-
-4. Iniciar la aplicación con PM2:
-
-```bash
-# Iniciar la aplicación
-pm2 start ecosystem.config.js
-
-# Ver logs
-pm2 logs front-server
-
-# Monitorear la aplicación
-pm2 monit
-
-# Reiniciar la aplicación
-pm2 restart front-server
-
-# Detener la aplicación
-pm2 stop front-server
-
-# Configurar inicio automático
-pm2 startup
-pm2 save
 ```
 
 ### 3. Variables de entorno
