@@ -122,17 +122,12 @@ server {
     listen 80;
     server_name tu-dominio.com;  # Reemplazar con tu dominio
 
-    # Configuración del proxy inverso
+    root /var/www/front-server;
+    index index.html;
+
+    # Configuración principal para SPA
     location / {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        try_files $uri $uri/ /index.html;
     }
 
     # Compresión GZIP
@@ -161,4 +156,22 @@ server {
 ```
 
 5. Habilitar el sitio:
+```bash
+# Crear enlace simbólico
+sudo ln -s /etc/nginx/sites-available/front-server /etc/nginx/sites-enabled/
+
+# Eliminar la configuración por defecto si existe
+sudo rm /etc/nginx/sites-enabled/default
+
+# Verificar la configuración
+sudo nginx -t
+
+# Reiniciar Nginx
+sudo systemctl restart nginx
 ```
+
+Notas importantes:
+- Reemplaza `tu-dominio.com` con tu dominio real
+- Asegúrate de que el puerto 80 esté abierto en tu firewall
+- Para desarrollo local, puedes usar `localhost` como server_name
+- La configuración incluye optimizaciones de rendimiento y seguridad
