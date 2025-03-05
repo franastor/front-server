@@ -1,141 +1,167 @@
-#root {
-  width: 100%;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
+.App {
+  text-align: center;
+  min-height: 100vh;
+  background-color: #282c34;
+  color: #00ff00;
+  font-family: 'Courier New', monospace;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  background-color: #1a1a1a;
+  padding: 20px;
+}
+
+.App-header {
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: 20px;
+}
+
+.App-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px #00ff00;
 }
 
 .terminal-container {
-  width: 90%;
+  width: 100%;
   max-width: 1000px;
-  height: 600px;
-  background-color: #2d2d2d;
-  border-radius: 8px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
-  overflow: hidden;
+  margin: 0 auto;
+  padding: 0 15px;
 }
 
 .terminal {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+  background-color: rgba(0, 0, 0, 0.9);
+  border: 2px solid #00ff00;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
 }
 
 .terminal-header {
-  background-color: #3d3d3d;
-  padding: 12px 20px;
-  border-bottom: 1px solid #4d4d4d;
+  background-color: #00ff00;
+  padding: 10px;
+  color: #000;
+  font-weight: bold;
 }
 
 .terminal-title {
-  color: #e0e0e0;
-  font-family: 'Courier New', monospace;
-  font-size: 18px;
-  font-weight: bold;
+  font-size: 1.1rem;
 }
 
 .terminal-content {
-  flex: 1;
   padding: 20px;
-  color: #00ff00;
-  font-family: 'Courier New', monospace;
-  font-size: 20px;
-  line-height: 1.8;
-  overflow-y: auto;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.welcome-line {
-  margin-bottom: 30px;
-  text-align: center;
-}
-
-.welcome-line .command {
-  font-size: 32px;
-  font-weight: bold;
-  color: #00ff00;
-  text-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
-  animation: glow 2s ease-in-out infinite alternate;
-}
-
-.command-line {
+.welcome-line, .command-line {
   display: flex;
   align-items: center;
-  margin-bottom: 12px;
-  animation: fadeInOut 0.5s ease-in-out;
+  gap: 10px;
+  font-size: 1.1rem;
+  text-align: left;
 }
 
 .prompt {
   color: #00ff00;
-  margin-right: 12px;
   font-weight: bold;
 }
 
 .command {
-  color: #00ff00;
-  text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+  color: #fff;
 }
 
 .loading-container {
   margin-top: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  width: 100%;
 }
 
 .loading-bar {
-  flex: 1;
-  height: 4px;
-  background-color: #1a1a1a;
-  border-radius: 2px;
+  width: 100%;
+  height: 20px;
+  background-color: rgba(0, 255, 0, 0.1);
+  border: 1px solid #00ff00;
+  border-radius: 10px;
   overflow: hidden;
-  position: relative;
 }
 
 .loading-progress {
   height: 100%;
   background-color: #00ff00;
-  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
-  transition: width 0.2s ease-in-out;
+  transition: width 0.3s ease;
 }
 
 .loading-text {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.9rem;
   color: #00ff00;
-  font-size: 16px;
-  min-width: 50px;
-  text-align: right;
 }
 
+/* Estilos responsive */
+@media (max-width: 768px) {
+  .App-header h1 {
+    font-size: 2rem;
+  }
+
+  .terminal-title {
+    font-size: 1rem;
+  }
+
+  .welcome-line, .command-line {
+    font-size: 1rem;
+  }
+
+  .terminal-content {
+    padding: 15px;
+    min-height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .App-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .terminal-title {
+    font-size: 0.9rem;
+  }
+
+  .welcome-line, .command-line {
+    font-size: 0.9rem;
+  }
+
+  .terminal-content {
+    padding: 10px;
+    min-height: 200px;
+  }
+
+  .loading-bar {
+    height: 15px;
+  }
+
+  .loading-text {
+    font-size: 0.8rem;
+  }
+}
+
+/* Animaciones */
 @keyframes glow {
-  from {
-    text-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
-  }
-  to {
-    text-shadow: 0 0 20px rgba(0, 255, 0, 0.9);
-  }
-}
-
-@keyframes fadeInOut {
   0% {
-    opacity: 0;
-    transform: translateY(5px);
+    box-shadow: 0 0 5px #00ff00;
   }
-  20% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  80% {
-    opacity: 1;
-    transform: translateY(0);
+  50% {
+    box-shadow: 0 0 20px #00ff00;
   }
   100% {
-    opacity: 0;
-    transform: translateY(-5px);
+    box-shadow: 0 0 5px #00ff00;
   }
+}
+
+.terminal {
+  animation: glow 2s infinite;
 }
 
 /* Estilo para la barra de desplazamiento */

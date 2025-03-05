@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import './App.css'
+import SystemInfo from './components/SystemInfo'
+import './components/SystemInfo.css'
 
 function App() {
   const [currentLine, setCurrentLine] = useState('')
@@ -48,27 +50,33 @@ function App() {
   }, [currentIndex])
 
   return (
-    <div className="terminal-container">
-      <div className="terminal">
-        <div className="terminal-header">
-          <span className="terminal-title">franastor@terminal:~$</span>
-        </div>
-        <div className="terminal-content">
-          <div className="welcome-line">
-            <span className="command">{commands[0].text}</span>
+    <div className="App">
+      <header className="App-header">
+        <h1>Terminal Simulator</h1>
+        <SystemInfo />
+      </header>
+      <div className="terminal-container">
+        <div className="terminal">
+          <div className="terminal-header">
+            <span className="terminal-title">franastor@terminal:~$</span>
           </div>
-          <div className="command-line">
-            <span className="prompt">$</span>
-            <span className="command">{currentLine}</span>
-          </div>
-          {currentIndex > 0 && currentIndex < commands.length && (
-            <div className="loading-container">
-              <div className="loading-bar">
-                <div className="loading-progress" style={{ width: `${loading}%` }}></div>
-              </div>
-              <span className="loading-text">{loading}%</span>
+          <div className="terminal-content">
+            <div className="welcome-line">
+              <span className="command">{commands[0].text}</span>
             </div>
-          )}
+            <div className="command-line">
+              <span className="prompt">$</span>
+              <span className="command">{currentLine}</span>
+            </div>
+            {currentIndex > 0 && currentIndex < commands.length && (
+              <div className="loading-container">
+                <div className="loading-bar">
+                  <div className="loading-progress" style={{ width: `${loading}%` }}></div>
+                </div>
+                <span className="loading-text">{loading}%</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
