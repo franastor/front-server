@@ -193,9 +193,20 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>Bienvenido al mundo de Franastor</h1>
-        <div style={{ marginTop: '10px', fontSize: '1.2rem', color: '#ff4444' }}>
-          Calaveras explotadas: {explodedSkulls} | Combo: {combo}x
-        </div>
+        {currentIndex >= 17 && (
+          <div style={{ 
+            marginTop: '10px', 
+            fontSize: '1.2rem', 
+            color: '#ff4444',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '10px'
+          }}>
+            <span style={{ fontSize: '1.5rem' }}>💀</span>
+            <span>Calaveras explotadas: {explodedSkulls} | Combo: {combo}x</span>
+          </div>
+        )}
       </header>
       <div className="terminal-container">
         <div className="terminal">
